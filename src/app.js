@@ -1,8 +1,12 @@
 import express from 'express';
-import { routes } from './routes/routes.js';
+import cors from "cors"
+import authRouter from './routers/authRouters.js';
 
 const app = express();
 
-app.use(routes)
+app.use(cors())
+app.use(express.json())
+app.use([authRouter])
+
 
 app.listen(5000, () => console.log('Server is running on port 5000'));
