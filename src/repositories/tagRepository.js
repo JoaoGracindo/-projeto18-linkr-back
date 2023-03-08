@@ -4,6 +4,6 @@ export function repoTrending(){
     return connection.query(`
         SELECT tags.name
         FROM tags
-        ORDER BY tags.mentions desc
+        ORDER BY tags.mentions desc;
     `)
 } 
