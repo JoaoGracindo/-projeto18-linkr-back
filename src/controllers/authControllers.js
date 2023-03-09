@@ -1,5 +1,6 @@
 import connection from "../database/database.js";
 import bcrypt from "bcrypt"
+import { v4 as uuid }  from "uuid"
 
 
 export async function signUp(req,res){
@@ -20,7 +21,26 @@ export async function signUp(req,res){
     }
 }
 
+export async function signIn(req,res){
 
+   
+    try {
+
+        const user = req.user
+
+        const token = uuid()
+        
+        await connection.query(`DELETE FROM sessions WHERE user_id = $1`,[user.id])
+
+        await connection.query(`INSERT INTO sessions (user_id,token)
+                                VALUES ($1,$2)`,[user.id,token])
+        
+        res.status(200).send(token)
+        
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
 
 // try {
         
