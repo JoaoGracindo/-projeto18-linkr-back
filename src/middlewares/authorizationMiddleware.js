@@ -6,7 +6,7 @@ async function userAuthorization(req, res, next){
 
     try{
         const {rows, rowCount} = await getSessionRepository(token);
-        if(rowCount === 0) return res.sensStatus(401);
+        if(rowCount === 0) return res.sendStatus(401);
 
         res.locals.userId = rows[0];
 
