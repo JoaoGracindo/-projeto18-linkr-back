@@ -8,7 +8,7 @@ export async function validateSignUp(req,res,next){
         
         const { rows:user } = await connection.query(`SELECT * FROM "users" WHERE email = $1`, [email])
 
-        if(user[0]) return res.status(422).send("email invalido")
+        if(user[0]) return res.status(400).send("email invalido")
 
     } catch (error) {
         res.status(500).send(error.message)
