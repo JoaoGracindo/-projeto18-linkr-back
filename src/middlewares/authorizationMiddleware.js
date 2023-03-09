@@ -8,7 +8,7 @@ async function userAuthorization(req, res, next){
         const {rows, rowCount} = await getSessionRepository(token);
         if(rowCount === 0) return res.sendStatus(401);
 
-        res.locals.userId = rows[0];
+        res.locals.userId = rows[0].user_id;
 
     }catch(err){
         return res.status(500).send(err.message);
