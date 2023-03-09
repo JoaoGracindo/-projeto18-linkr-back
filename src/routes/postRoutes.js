@@ -8,6 +8,7 @@ import {postLinkController} from "../controllers/postControllers.js";
 const router = Router();
 
 router.use(auth);
+router.get('/timeline')
 router.post('/post-link', validateSchema(linkSchema), postLinkController);
 
 export default router;

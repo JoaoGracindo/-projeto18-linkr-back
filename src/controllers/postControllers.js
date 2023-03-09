@@ -1,5 +1,10 @@
 import {insertPostRepository} from "../repositories/postRepository.js";
 
+export async function getTimelineController(req, res){
+
+    
+}
+
 export async function postLinkController(req, res){
 
     const {userId} = res.locals;
