@@ -16,7 +16,35 @@ export async function getTimelineRepository(){
         FROM posts p
         JOIN users u
         ON p.owner=u.id
+        WHERE p.deleted=false
         ORDER BY p.created_at DESC
         LIMIT 20;
     `)
+}
+
+export async function getPostOwnerRepository(postId){
+
+    return await db.query(`
+        SELECT owner
+        FROM posts
+        WHERE id=$1;
+    `, [postId]);
+}
+
+export async function putLinkRepository(newDescription, postId){
+
+    return await db.query(`
+        UPDATE posts
+        SET description=$1
+        WHERE id=$2;
+    `, [newDescription, postId]);
+}
+
+export async function deleteLinkRepository(postId){
+
+    return await db.query(`
+        UPDATE posts
+        SET deleted=TRUE
+        WHERE id=$1;
+    `, [postId]);
 }

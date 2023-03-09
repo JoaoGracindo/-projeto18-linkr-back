@@ -2,7 +2,7 @@ import { getSessionRepository } from "../repositories/userRepository.js";
 
 async function userAuthorization(req, res, next){
     const token = req.headers.authorization?.replace('Bearer ', '');
-    if(!token) return res.sensStatus(401);
+    if(!token) return res.sendStatus(401);
 
     try{
         const {rows, rowCount} = await getSessionRepository(token);
