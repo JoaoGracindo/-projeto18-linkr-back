@@ -4,8 +4,8 @@ import userAuthorization from "../middlewares/authorizationMiddleware.js";
 
 const likesRoutes = Router()
 
-likesRoutes.post('/likes/:post_id' ,postLike)
-likesRoutes.delete('/likes/:post_id', deleteLike)
+likesRoutes.post('/likes/:post_id' ,userAuthorization, postLike)
+likesRoutes.delete('/likes/:post_id', userAuthorization, deleteLike)
 likesRoutes.get('/likes/:post_id', getPostLikes)
 
 export default likesRoutes
