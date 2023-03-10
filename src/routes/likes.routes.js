@@ -2,10 +2,10 @@ import { Router } from "express";
 import { postLike, deleteLike, getPostLikes } from "../controllers/likes.controller.js";
 import userAuthorization from "../middlewares/authorizationMiddleware.js";
 
-const likesRoutes = Router()
+const likesRouter = Router()
 
-likesRoutes.post('/likes/:post_id' ,userAuthorization, postLike)
-likesRoutes.delete('/likes/:post_id', userAuthorization, deleteLike)
-likesRoutes.get('/likes/:post_id', getPostLikes)
+likesRouter.post('/likes/:post_id' ,postLike)
+likesRouter.delete('/likes/:post_id', deleteLike)
+likesRouter.get('/likes/:post_id', getPostLikes)
 
-export default likesRoutes
+export default likesRouter
