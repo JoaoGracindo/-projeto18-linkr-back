@@ -45,8 +45,8 @@ export async function signIn(req,res){
 export async function logout(req,res){
 
     try {
-        const token = req.headers.authorization?.replace('Bearer ', '');
-        if(!token) return res.status(401).send("esqueceu o token");
+
+        const token = req.token
         
         await connection.query(`DELETE FROM sessions WHERE token = $1`,[token])
 
