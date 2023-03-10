@@ -3,15 +3,16 @@ import { Router } from "express";
 import auth from "../middlewares/authorizationMiddleware.js";
 import linkSchema from "../schemas/linkSchema.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
-import {deleteLinkController, getTimelineController, postLinkController, putLinkController} from "../controllers/postControllers.js";
+import {deleteLinkController, getPostsByHashtag, getTimelineController, postLinkController, putLinkController} from "../controllers/postControllers.js";
 import { postOwnerValidation } from "../middlewares/postMatchMiddleware.js";
 
 const router = Router();
 
-router.use(auth);
-router.get('/timeline', getTimelineController);
-router.post('/post-link', validateSchema(linkSchema), postLinkController);
-router.put('/link/:id', postOwnerValidation, putLinkController);
-router.delete('/link/:id', postOwnerValidation, deleteLinkController);
+
+router.get('/timeline', auth, getTimelineController);
+router.get('/hashtags/:hashtag', auth, getPostsByHashtag);
+router.post('/post-link', auth, validateSchema(linkSchema), postLinkController);
+router.put('/link/:id', auth, postOwnerValidation, putLinkController);
+router.delete('/link/:id', auth, postOwnerValidation, deleteLinkController);
 
 export default router;
