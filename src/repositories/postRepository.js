@@ -68,3 +68,39 @@ export async function deleteLinkRepository(postId){
         WHERE id=$1;
     `, [postId]);
 }
+
+export async function getTimelineByHashtagRepository(hashtag){
+
+    return await db.query(`
+        SELECT 
+        p.*,
+        COUNT(l.*) AS num_likes, users.pic_url, users.name, users.id,
+        subq.last_likers
+        FROM 
+        posts p
+        JOIN users
+        ON users.id = p.owner
+        JOIN
+        "tagsPivot" tp ON p.id = tp.post_id
+        LEFT JOIN 
+        likes l ON p.id = l.post_id
+        LEFT JOIN LATERAL (
+        SELECT 
+          ARRAY_AGG(u.name) AS last_likers
+        FROM 
+          likes ll
+        JOIN 
+          users u ON ll.user_id = u.id
+        WHERE 
+          ll.post_id = p.id GROUP BY ll.created_at 
+        ORDER BY 
+          ll.created_at DESC
+        LIMIT 2
+        ) subq ON true
+        WHERE tp.id = 1
+        GROUP BY 
+        p.id, subq.last_likers
+        ORDER BY 
+        p.created_at DESC;
+    `)
+}

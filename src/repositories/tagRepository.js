@@ -44,7 +44,7 @@ export async function insertTag(tag, post_id) {
         WHERE tags.name = $1
         LIMIT 1
     `, [tag])
-    
+
     return connection.query(`
         INSERT INTO "tagsPivot" (post_id, tag_id)
         VALUES ($1, $2)
