@@ -16,6 +16,8 @@ export async function postLinkController(req, res){
     const {userId} = res.locals;
     const {link} = req.body;
     const description = req.body.description ?? null;
+    const meta = await urlMetadata(link)
+    console.log(meta)
 
     try{
         await insertPostRepository(userId, link, description);

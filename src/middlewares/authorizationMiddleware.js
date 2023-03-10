@@ -9,6 +9,7 @@ async function userAuthorization(req, res, next){
         if(rowCount === 0) return res.sendStatus(401);
 
         res.locals.userId = rows[0].user_id;
+        req.token = token
 
     }catch(err){
         return res.status(500).send(err.message);
