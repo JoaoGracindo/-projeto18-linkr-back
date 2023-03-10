@@ -2,12 +2,12 @@ import connection from "../database/database.js";
 
 export function repoTrending(){
     return connection.query(`
-        SELECT tags.name AS name, count("tagsPivot".tag_id)
-        FROM "tagsPivot"
+        SELECT tags.name AS name, count(tags_pivot.tag_id)
+        FROM tags_pivot
         JOIN tags
-        ON "tagsPivot".tag_id = tags.id
+        ON tags_pivot.tag_id = tags.id
         GROUP BY tags.name
-        ORDER BY count("tagsPivot".tag_id) desc
+        ORDER BY count(tags_pivot.tag_id) desc
     `)
 } 
 
@@ -44,9 +44,9 @@ export async function insertTag(tag, post_id) {
         WHERE tags.name = $1
         LIMIT 1
     `, [tag])
-    
+
     return connection.query(`
-        INSERT INTO "tagsPivot" (post_id, tag_id)
+        INSERT INTO tags_pivot (post_id, tag_id)
         VALUES ($1, $2)
 `, [post_id, tag_id])
 }
