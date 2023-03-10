@@ -8,10 +8,10 @@ import { postOwnerValidation } from "../middlewares/postMatchMiddleware.js";
 
 const router = Router();
 
-router.use(auth);
-router.get('/timeline', getTimelineController);
-router.post('/post-link', validateSchema(linkSchema), postLinkController);
-router.put('/link/:id', postOwnerValidation, putLinkController);
-router.delete('/link/:id', postOwnerValidation, deleteLinkController);
+
+router.get('/timeline', auth, getTimelineController);
+router.post('/post-link', auth, validateSchema(linkSchema), postLinkController);
+router.put('/link/:id', auth, postOwnerValidation, putLinkController);
+router.delete('/link/:id', auth, postOwnerValidation, deleteLinkController);
 
 export default router;
