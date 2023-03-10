@@ -12,13 +12,33 @@ export async function insertPostRepository(userId, link, description){
 export async function getTimelineRepository(){
 
     return await db.query(`
-        SELECT u.name, u.pic_url, p.link, p.description, p.id AS id
-        FROM posts p
-        JOIN users u
-        ON p.owner=u.id
-        WHERE p.deleted=false
-        ORDER BY p.created_at DESC
-        LIMIT 20;
+    SELECT 
+    p.*,
+    COUNT(l.*) AS num_likes,
+    subq.last_likers
+  FROM 
+    posts p
+  LEFT JOIN 
+    likes l ON p.id = l.post_id
+  LEFT JOIN LATERAL (
+    SELECT 
+      ARRAY_AGG(u.name) AS last_likers
+    FROM 
+      likes ll
+    JOIN 
+      users u ON ll.user_id = u.id
+    WHERE 
+      ll.post_id = p.id GROUP BY ll.created_at 
+    ORDER BY 
+      ll.created_at DESC
+    LIMIT 2
+  ) subq ON true
+  WHERE deleted=false
+  GROUP BY 
+    p.id, subq.last_likers
+  ORDER BY 
+    p.created_at DESC
+  LIMIT 20;
     `)
 }
 
