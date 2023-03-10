@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { getTrending } from "../controllers/tags.controller.js";
+import { getTrending, postTag } from "../controllers/tags.controller.js";
 
-const tagsRoutes = Router()
+const tagsRouter = Router()
 
-tagsRoutes.get('/hashtags/trending', getTrending)
+tagsRouter.get('/hashtags/trending', getTrending)
+tagsRouter.post('/hashtags', postTag)
 
-export default tagsRoutes
+export default tagsRouter
