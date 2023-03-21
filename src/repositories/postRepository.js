@@ -56,3 +56,23 @@ export async function deleteLinkRepository(postId) {
     [postId]
   );
 }
+
+export async function getPostByHashtagRepository(hashtag) {
+  return await db.query(
+    `
+      SELECT p.owner, p.link, p.description, p.id, users.pic_url, users.name
+      FROM posts p
+      JOIN users
+      ON users.id = p.owner
+      JOIN tags_pivot pt
+      ON pt.post_id = p.id
+      JOIN tags
+      ON tags.id = pt.tag_id
+      WHERE p.deleted = false AND tags.name = $1
+      GROUP BY p.id, users.pic_url, users.name
+      ORDER BY p.created_at DESC
+      LIMIT 20;
+    `,
+    [hashtag]
+  );
+}
