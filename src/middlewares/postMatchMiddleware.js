@@ -8,6 +8,7 @@ export async function postOwnerValidation(req, res, next){
         const {rowCount, rows} = await getPostOwnerRepository(postId);
         if(rowCount === 0) return res.sendStatus(404);
         const {owner} = rows[0];
+
         if(owner !== userId) return res.sendStatus(401);
 
     }catch(err){
