@@ -4,30 +4,62 @@ import {
   putLinkRepository,
   deleteLinkRepository,
   getPostByHashtagRepository,
+  userLikedRepository
 } from "../repositories/postRepository.js";
+import urlMetadata from "url-metadata";
 import { getLikesRepository } from "../repositories/getUserByIdRepository.js";
 
 export async function getTimelineController(req, res) {
+  let responseSent = false
+  const user_id = res.locals?.userId
   try {
     const { rows: timeline } = await getTimelineRepository();
     const likes = [];
+    let liked = false
     for (let i = 0; timeline.length > i; i++) {
+
       const {count: {rows: [count]}, users: {rows: users}} = await getLikesRepository(timeline[i].id);
       
+      let url_metadata = {};
+      try {
+        const urlMetadataResponse = await urlMetadata(timeline[i].link) //url_metadata
+        const {url, title, description, image} = urlMetadataResponse
+        url_metadata = {url, title, description, image}
+      } catch (err) {
+        console.error('Error getting metadata for URL:', timeline[i].link);
+        // Handle the error in some way that suits your needs, e.g. set default values for metadata
+        url_metadata = { url: '', title: '', description: '', image: '' };
+      }
+
+      if(user_id) 
+      {
+        
+        let likedQuery = await userLikedRepository(user_id, timeline[i].id)
+        if(likedQuery.rowCount > 0)
+        {
+          liked = true
+        }
+      };
+
       const names = users.map(user => user.name)
       likes.push({
         count: count.count,
-        users: names
+        users: names,
+        liked: liked,
+        url_metadata
       });
     }
     const results = [];
     for (let i = 0; timeline.length > i; i++) {
-      results.push({ ...timeline[i], likersNames: likes[i].users, likesCount: likes[i].count });
+      results.push({ ...timeline[i], likersNames: likes[i].users, likesCount: likes[i].count, liked: likes[i].liked, url_metadata: likes[i].url_metadata });
     }
-
-    return res.status(200).send(results);
+    
+    responseSent = true;
+    res.send(results);
+    
   } catch (err) {
-    return res.status(500).send(err.message);
+    if(!responseSent) res.status(500).send(err);
+    console.log(err)
   }
 }
 

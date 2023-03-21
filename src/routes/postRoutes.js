@@ -8,7 +8,8 @@ import { postOwnerValidation } from "../middlewares/postMatchMiddleware.js";
 
 const router = Router();
 
-router.get('/timeline', auth, getTimelineController);
+
+router.get('/timeline', (req, res, next) => {if(req.headers?.authorization) {auth(req, res, next)} else{next()}} , getTimelineController);
 router.get('/hashtags/:hashtag', auth, getPostsByHashtag);
 router.post('/post-link', auth, validateSchema(linkSchema), postLinkController);
 router.put('/link/:id', auth, postOwnerValidation, putLinkController);

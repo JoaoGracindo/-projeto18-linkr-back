@@ -76,3 +76,13 @@ export async function getPostByHashtagRepository(hashtag) {
     [hashtag]
   );
 }
+
+export async function userLikedRepository(user_id, post_id){
+  return await db.query(
+    `
+      SELECT likes.id as liked
+      FROM likes
+      WHERE likes.user_id = $1 AND likes.post_id = $2
+    `, [user_id, post_id]
+  )
+}
