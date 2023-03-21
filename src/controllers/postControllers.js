@@ -4,6 +4,10 @@ import urlMetadata from 'url-metadata';
 
 export async function getTimelineController(req, res){
     try{
+
+        const teste = await repoGetPostLikes();
+
+        console.log(teste)
         const {rows: timeline} = await getTimelineRepository();
         for(let i = 0; i < timeline.length; i++){
             const { count: {rows: [count]}, users: {rows: users} } = await repoGetPostLikes(timeline[i].id);
