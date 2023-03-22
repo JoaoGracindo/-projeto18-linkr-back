@@ -1,4 +1,4 @@
-import { createTag, insertTag, repoTagExist, repoTrending } from "../repositories/tagRepository.js";
+import { createTag, insertTag, repoTagExist, repoTagId, repoTrending, repoDeletePostTags } from "../repositories/tagRepository.js";
 
 export async function getTrending(req, res){
     try {
@@ -14,7 +14,6 @@ export async function getTrending(req, res){
 export async function postTag(req, res){
     try {
         const { tags, post_id } = req.body
-        const {userId} = res.locals
 
         const existentTags = await repoTagExist(tags)
 
@@ -28,6 +27,19 @@ export async function postTag(req, res){
         }
 
         res.status(201).send()
+    } catch (error) {
+        console.log(error)
+        res.status(500).send(error)
+    }
+}
+
+export async function deletePostTags(req, res){
+    try {
+        const { post_id } = req.params
+
+        await repoDeletePostTags(post_id)
+
+        res.status(204).send()
     } catch (error) {
         console.log(error)
         res.status(500).send(error)
