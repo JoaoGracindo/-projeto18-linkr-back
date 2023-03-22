@@ -6,6 +6,6 @@ import userAuthorization from "../middlewares/authorizationMiddleware.js";
 const userRouter = Router();
 
 userRouter.get("/user/:id", userAuthorization, getUserByIdController);
-userRouter.get("/users", getUsersController);
+userRouter.get("/users/:nameSearched", getUsersController);
 
 export default userRouter;
