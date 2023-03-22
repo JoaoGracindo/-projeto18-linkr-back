@@ -30,6 +30,19 @@ export async function repoTagExist(tags) {
     return arr
   }
 
+export async function repoTagId(tags) {
+let arr = []
+for (let i = 0; i < tags.length; i++) {
+    const {rows: [{id: id}]} = await connection.query(`
+        SELECT tags.id AS id
+        FROM tags
+        WHERE tags.name = $1;
+    `, [tags[i]])
+    arr.push(id)
+}
+return arr
+}
+
 export function createTag(tag) {
     return connection.query(`
         INSERT INTO tags (name)
@@ -49,4 +62,12 @@ export async function insertTag(tag, post_id) {
         INSERT INTO "tagsPivot" (post_id, tag_id)
         VALUES ($1, $2)
 `, [post_id, tag_id])
+}
+
+export async function repoDeletePostTags(post_id){
+    await connection.query(`
+        DELETE FROM 
+        "tagsPivot"
+        WHERE "tagsPivot".post_id = $1
+    `, [post_id])
 }

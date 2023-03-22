@@ -5,7 +5,8 @@ export async function insertPostRepository(userId, link, description) {
     `
         INSERT INTO posts
         (owner, link, description)
-        VALUES ($1, $2, $3);    
+        VALUES ($1, $2, $3)
+        RETURNING id;    
     `,
     [userId, link, description]
   );
@@ -64,7 +65,7 @@ export async function getPostByHashtagRepository(hashtag) {
       FROM posts p
       JOIN users
       ON users.id = p.owner
-      JOIN tags_pivot pt
+      JOIN "tagsPivot" pt
       ON pt.post_id = p.id
       JOIN tags
       ON tags.id = pt.tag_id
