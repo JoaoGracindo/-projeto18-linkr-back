@@ -1,7 +1,7 @@
 import { getUsersRepository } from "../repositories/getUsersRepository.js";
 
 export async function getUsersController(req, res) {
-  const { nameSearched } = req.body;
+  const { nameSearched } = req.params;
   
 
   try {
