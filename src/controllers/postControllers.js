@@ -4,7 +4,8 @@ import {
   putLinkRepository,
   deleteLinkRepository,
   getPostByHashtagRepository,
-  userLikedRepository
+  userLikedRepository,
+  repostLinkRepository
 } from "../repositories/postRepository.js";
 import urlMetadata from "url-metadata";
 import { getLikesRepository } from "../repositories/getUserByIdRepository.js";
@@ -144,5 +145,21 @@ export async function getPostsByHashtag(req, res) {
   } catch (err) {
     if(!responseSent) res.status(500).send(err);
     console.log(err)
+  }
+}
+
+
+export async function repostLinkController(req,res){
+
+  try {
+
+    const { userId, post_id } = req.body
+
+    repostLinkRepository(userId,post_id)
+
+    res.status(201).send("ok")
+
+  } catch (error) {
+    res.status(500).send(error.message)
   }
 }
