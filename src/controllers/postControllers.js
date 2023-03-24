@@ -5,62 +5,69 @@ import {
   deleteLinkRepository,
   getPostByHashtagRepository,
   userLikedRepository,
-  repostLinkRepository
+  repostLinkRepository,
 } from "../repositories/postRepository.js";
 import urlMetadata from "url-metadata";
 import { getLikesRepository } from "../repositories/getUserByIdRepository.js";
 
 export async function getTimelineController(req, res) {
-  let responseSent = false
-  const user_id = res.locals?.userId
+  let responseSent = false;
+  const user_id = res.locals?.userId;
   try {
     const { rows: timeline } = await getTimelineRepository();
     const likes = [];
-    let liked = false
+    
     for (let i = 0; timeline.length > i; i++) {
+      let liked = false;
+      const {
+        count: {
+          rows: [count],
+        },
+        users: { rows: users },
+      } = await getLikesRepository(timeline[i].id);
 
-      const {count: {rows: [count]}, users: {rows: users}} = await getLikesRepository(timeline[i].id);
-      
       let url_metadata = {};
       try {
-        const urlMetadataResponse = await urlMetadata(timeline[i].link) //url_metadata
-        const {url, title, description, image} = urlMetadataResponse
-        url_metadata = {url, title, description, image}
+        const urlMetadataResponse = await urlMetadata(timeline[i].link); //url_metadata
+        const { url, title, description, image } = urlMetadataResponse;
+        url_metadata = { url, title, description, image };
       } catch (err) {
-        console.error('Error getting metadata for URL:', timeline[i].link);
+        console.error("Error getting metadata for URL:", timeline[i].link);
         // Handle the error in some way that suits your needs, e.g. set default values for metadata
-        url_metadata = { url: '', title: '', description: '', image: '' };
+        url_metadata = { url: "", title: "", description: "", image: "" };
       }
 
-      if(user_id) 
-      {
-        
-        let likedQuery = await userLikedRepository(user_id, timeline[i].id)
-        if(likedQuery.rowCount > 0)
-        {
-          liked = true
+      if (user_id) {
+        let likedQuery = await userLikedRepository(user_id, timeline[i].id);
+        if (likedQuery.rowCount > 0) {
+          liked = true;
         }
-      };
+      }
 
-      const names = users.map(user => user.name)
+      const names = users.map((user) => user.name);
       likes.push({
         count: count.count,
         users: names,
         liked: liked,
-        url_metadata
+        url_metadata,
       });
     }
     const results = [];
     for (let i = 0; timeline.length > i; i++) {
-      results.push({ ...timeline[i], likersNames: likes[i].users, likesCount: likes[i].count, liked: likes[i].liked, url_metadata: likes[i].url_metadata });
+      results.push({
+        ...timeline[i],
+        likersNames: likes[i].users,
+        likesCount: likes[i].count,
+        liked: likes[i].liked,
+        url_metadata: likes[i].url_metadata,
+      });
     }
-    
+
     responseSent = true;
     res.send(results);
-    
   } catch (err) {
-    if(!responseSent) res.status(500).send(err);
-    console.log(err)
+    if (!responseSent) res.status(500).send(err);
+    console.log(err);
   }
 }
 
@@ -70,7 +77,9 @@ export async function postLinkController(req, res) {
   const description = req.body.description ?? null;
 
   try {
-    const {rows: [id]} =await insertPostRepository(userId, link, description);
+    const {
+      rows: [id],
+    } = await insertPostRepository(userId, link, description);
     return res.status(201).send(id);
   } catch (err) {
     return res.status(500).send(err.message);
@@ -101,65 +110,72 @@ export async function deleteLinkController(req, res) {
 }
 
 export async function getPostsByHashtag(req, res) {
-  let responseSent = false
+  let responseSent = false;
   const { hashtag } = req.params;
-  const user_id = res.locals.userId
+  const user_id = res.locals.userId;
   try {
     const { rows: posts } = await getPostByHashtagRepository(hashtag);
     const morePostsInfos = [];
-    let liked = false
+
     for (let i = 0; posts.length > i; i++) {
-      const {count: {rows: [count]}, users: {rows: users}} = await getLikesRepository(posts[i].id);
-      
+      let liked = false;
+      const {
+        count: {
+          rows: [count],
+        },
+        users: { rows: users },
+      } = await getLikesRepository(posts[i].id);
+
       let url_metadata = {};
       try {
-        const urlMetadataResponse = await urlMetadata(posts[i].link) //url_metadata
-        const {url, title, description, image} = urlMetadataResponse
-        url_metadata = {url, title, description, image}
+        const urlMetadataResponse = await urlMetadata(posts[i].link); //url_metadata
+        const { url, title, description, image } = urlMetadataResponse;
+        url_metadata = { url, title, description, image };
       } catch (err) {
-        console.error('Error getting metadata for URL:', posts[i].link);
+        console.error("Error getting metadata for URL:", posts[i].link);
         // Handle the error in some way that suits your needs, e.g. set default values for metadata
-        url_metadata = { url: '', title: '', description: '', image: '' };
+        url_metadata = { url: "", title: "", description: "", image: "" };
       }
-      
-      let likedQuery = await userLikedRepository(user_id, posts[i].id)
-        if(likedQuery.rowCount > 0)
-        {
-          liked = true
-        }
-      
-      const names = users.map(user => user.name)
+
+      let likedQuery = await userLikedRepository(user_id, posts[i].id);
+      if (likedQuery.rowCount > 0) {
+        liked = true;
+      }
+
+      const names = users.map((user) => user.name);
       morePostsInfos.push({
         count: count.count,
         users: names,
         liked: liked,
-        url_metadata
+        url_metadata,
       });
     }
     const results = [];
     for (let i = 0; posts.length > i; i++) {
-      results.push({ ...posts[i], likersNames: morePostsInfos[i].users, likesCount: morePostsInfos[i].count, liked: morePostsInfos[i].liked, url_metadata: morePostsInfos[i].url_metadata  });
+      results.push({
+        ...posts[i],
+        likersNames: morePostsInfos[i].users,
+        likesCount: morePostsInfos[i].count,
+        liked: morePostsInfos[i].liked,
+        url_metadata: morePostsInfos[i].url_metadata,
+      });
     }
 
     return res.status(200).send(results);
   } catch (err) {
-    if(!responseSent) res.status(500).send(err);
-    console.log(err)
+    if (!responseSent) res.status(500).send(err);
+    console.log(err);
   }
 }
 
-
-export async function repostLinkController(req,res){
-
+export async function repostLinkController(req, res) {
   try {
+    const { userId, post_id } = req.body;
 
-    const { userId, post_id } = req.body
+    repostLinkRepository(userId, post_id);
 
-    repostLinkRepository(userId,post_id)
-
-    res.status(201).send("ok")
-
+    res.status(201).send("ok");
   } catch (error) {
-    res.status(500).send(error.message)
+    res.status(500).send(error.message);
   }
 }
