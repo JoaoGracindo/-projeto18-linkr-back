@@ -12,8 +12,11 @@ export async function postCommentRepository(userId, postId, comment){
 export async function getCommentByIdRepository(id){
 
     return db.query(`
-        SELECT *
+        SELECT c.comment, u.name, u.pic_url
         FROM comments c
-        WHERE c.id=$1;
+        JOIN users u
+        ON c.user_id = u.id
+        WHERE c.id=$1
+        ORDER BY c.created_at ASC;
     `, [id])
 }
