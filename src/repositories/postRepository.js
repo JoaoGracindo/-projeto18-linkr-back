@@ -65,7 +65,7 @@ export async function getPostByHashtagRepository(hashtag) {
       FROM posts p
       JOIN users
       ON users.id = p.owner
-      JOIN "tagsPivot" pt
+      JOIN "tags_pivot" pt
       ON pt.post_id = p.id
       JOIN tags
       ON tags.id = pt.tag_id
@@ -85,5 +85,17 @@ export async function userLikedRepository(user_id, post_id){
       FROM likes
       WHERE likes.user_id = $1 AND likes.post_id = $2
     `, [user_id, post_id]
+  )
+}
+
+export async function repostLinkRepository(user_id,post_id){
+  return await db.query(
+    `
+    INSERT INTO reposts
+    (user_id,post_id)
+    VALUES
+    ($1,$2)
+    
+    `,[user_id,post_id]
   )
 }
