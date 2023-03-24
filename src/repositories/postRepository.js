@@ -65,7 +65,7 @@ export async function getPostByHashtagRepository(hashtag) {
       FROM posts p
       JOIN users
       ON users.id = p.owner
-      JOIN "tagsPivot" pt
+      JOIN "tags_pivot" pt
       ON pt.post_id = p.id
       JOIN tags
       ON tags.id = pt.tag_id
