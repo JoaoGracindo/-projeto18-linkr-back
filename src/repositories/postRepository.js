@@ -14,7 +14,7 @@ export async function insertPostRepository(userId, link, description) {
 
 export async function getTimelineRepository() {
   return await db.query(`
-  SELECT p.owner, p.link, p.description, p.id, users.pic_url, users.name
+  SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name
   FROM posts p
   JOIN users
   ON users.id = p.owner
@@ -116,3 +116,26 @@ export async function getReposts(){
     `
   )
 }
+
+export async function repostInPosts(user_id,post_id){
+
+  try {
+    
+    const {rows:post} = await db.query(`SELECT * FROM posts WHERE id = $1`,[post_id])
+    
+    const {owner,link,description} =  post[0]
+
+    return await db.query(
+      `
+      INSERT INTO posts
+      (owner,link,description,reposted_by,origin_post_id)
+      VALUES
+      ($1,$2,$3,$4,$5)
+      `,[owner,link,description,user_id,post_id]
+    )
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
