@@ -14,14 +14,16 @@ export async function insertPostRepository(userId, link, description) {
 
 export async function getTimelineRepository() {
   return await db.query(`
-  SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name
+  SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name,
+  repost_user.name AS reposted_by_name
   FROM posts p
-  JOIN users
-  ON users.id = p.owner
+  JOIN users ON users.id = p.owner
+  LEFT JOIN users AS repost_user ON repost_user.id = p.reposted_by
   WHERE p.deleted = false
-  GROUP BY p.id, users.pic_url, users.name
+  GROUP BY p.id, users.pic_url, users.name, repost_user.name
   ORDER BY p.created_at DESC
   LIMIT 20;
+
     `);
 }
 
