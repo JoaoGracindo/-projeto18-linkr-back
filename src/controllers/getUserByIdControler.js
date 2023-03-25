@@ -3,6 +3,7 @@ import {
   getUserByIdRepository,
 } from "../repositories/getUserByIdRepository.js";
 import { userLikedRepository } from "../repositories/postRepository.js";
+import urlMetadata from "url-metadata";
 
 export async function getUserByIdController(req, res) {
   let responseSent = false;
@@ -27,7 +28,7 @@ export async function getUserByIdController(req, res) {
         const { url, title, description, image } = urlMetadataResponse;
         url_metadata = { url, title, description, image };
       } catch (err) {
-        console.error("Error getting metadata for URL:", posts[i].link);
+        console.error(err);
         // Handle the error in some way that suits your needs, e.g. set default values for metadata
         url_metadata = { url: "", title: "", description: "", image: "" };
       }
@@ -55,6 +56,7 @@ export async function getUserByIdController(req, res) {
         url_metadata: morePostsInfos[i].url_metadata,
       });
     }
+
 
     return res.status(200).send(results);
   } catch (err) {
