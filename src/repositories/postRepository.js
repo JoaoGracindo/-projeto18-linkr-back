@@ -17,7 +17,8 @@ export async function getTimelineRepository(refresh_type, timestamp) {
   if(refresh_type === "bottom") time_filter = `AND p.created_at < ${timestamp}` 
   if(refresh_type === "top")  time_filter = `AND p.created_at > ${timestamp}` 
   return await db.query(`
-  SELECT p.owner, p.link, p.description, p.id,  p.created_at, users.pic_url
+
+  SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name
   FROM posts p
   JOIN users
   ON users.id = p.owner
@@ -105,3 +106,43 @@ export async function repostLinkRepository(user_id,post_id){
     `,[user_id,post_id]
   )
 }
+
+export async function getReposts(){
+  return await db.query(
+    `
+    SELECT p.owner, p.link, p.description, p.id, users.pic_url
+    FROM posts p
+    JOIN users
+    ON users.id = p.owner
+    JOIN reposts
+    ON posts.id = resposts.post_id
+    WHERE p.deleted = false
+    GROUP BY p.id, users.pic_url, users.name
+    ORDER BY p.created_at DESC
+    LIMIT 20;
+    `
+  )
+}
+
+export async function repostInPosts(user_id,post_id){
+
+  try {
+    
+    const {rows:post} = await db.query(`SELECT * FROM posts WHERE id = $1`,[post_id])
+    
+    const {owner,link,description} =  post[0]
+
+    return await db.query(
+      `
+      INSERT INTO posts
+      (owner,link,description,reposted_by,origin_post_id)
+      VALUES
+      ($1,$2,$3,$4,$5)
+      `,[owner,link,description,user_id,post_id]
+    )
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+

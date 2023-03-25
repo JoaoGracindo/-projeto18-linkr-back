@@ -66,8 +66,5 @@ export async function getUserByIdController(req, res) {
     console.log(err);
   }
 }
-// names.map((name) => {
-//           return name.name;
-//         }
 
 

@@ -13,8 +13,8 @@ const router = Router();
 router.get('/timeline', (req, res, next) => {if(req.headers?.authorization) {auth(req, res, next)} else{next()}} , getTimelineController);
 router.get('/hashtags/:hashtag', auth, getPostsByHashtag);
 router.post('/post-link', auth, validateSchema(linkSchema), postLinkController);
+router.post('/repost-link', auth, validateSchema(repostSchema), repostLinkController)
 router.put('/link/:id', auth, postOwnerValidation, putLinkController);
 router.delete('/link/:id', auth, postOwnerValidation, deleteLinkController);
-router.post('/repost-link', auth, validateSchema(repostSchema), repostLinkController)
 
 export default router;
