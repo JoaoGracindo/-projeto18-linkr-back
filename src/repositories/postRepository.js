@@ -14,7 +14,7 @@ export async function insertPostRepository(userId, link, description) {
 
 export async function getTimelineRepository() {
   return await db.query(`
-  SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url
+  SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name
   FROM posts p
   JOIN users
   ON users.id = p.owner
@@ -138,3 +138,4 @@ export async function repostInPosts(user_id,post_id){
     console.log(error)
   }
 }
+
