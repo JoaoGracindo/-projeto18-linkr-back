@@ -18,7 +18,7 @@ export async function getTimelineRepository(refresh_type, timestamp) {
   if(refresh_type === "top")  time_filter = `AND p.created_at > ${timestamp}` 
   return await db.query(`
 
-  SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name
+  SELECT p.owner, p.link, p.description, p.id, p.created_at, p.reposted_by, p.origin_post_id, users.pic_url, users.name
   FROM posts p
   JOIN users
   ON users.id = p.owner
