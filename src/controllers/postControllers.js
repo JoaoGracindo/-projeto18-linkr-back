@@ -6,7 +6,8 @@ import {
   getPostByHashtagRepository,
   userLikedRepository,
   repostLinkRepository,
-  getReposts
+  getReposts,
+  repostInPosts
 } from "../repositories/postRepository.js";
 import urlMetadata from "url-metadata";
 import { getLikesRepository } from "../repositories/getUserByIdRepository.js";
@@ -174,6 +175,8 @@ export async function repostLinkController(req, res) {
     const { user_id, post_id } = req.body
 
     repostLinkRepository(user_id,post_id)
+
+    repostInPosts(user_id,post_id)
 
     res.status(201).send("ok");
   } catch (error) {
