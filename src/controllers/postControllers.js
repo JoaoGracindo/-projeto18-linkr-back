@@ -13,8 +13,9 @@ import { getLikesRepository } from "../repositories/getUserByIdRepository.js";
 export async function getTimelineController(req, res) {
   let responseSent = false;
   const user_id = res.locals?.userId;
+  const {refresh_type, timestamp} = req.body
   try {
-    const { rows: timeline } = await getTimelineRepository();
+    const { rows: timeline } = await getTimelineRepository(refresh_type, timestamp);
     const likes = [];
     
     for (let i = 0; timeline.length > i; i++) {
@@ -113,8 +114,9 @@ export async function getPostsByHashtag(req, res) {
   let responseSent = false;
   const { hashtag } = req.params;
   const user_id = res.locals.userId;
+  const {refresh_type, timestamp} = req.body
   try {
-    const { rows: posts } = await getPostByHashtagRepository(hashtag);
+    const { rows: posts } = await getPostByHashtagRepository(hashtag, refresh_type, timestamp);
     const morePostsInfos = [];
 
     for (let i = 0; posts.length > i; i++) {

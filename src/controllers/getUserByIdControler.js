@@ -8,10 +8,11 @@ import urlMetadata from "url-metadata";
 export async function getUserByIdController(req, res) {
   let responseSent = false;
   const { id } = req.params;
+  const {refresh_type, timestamp} = req.body
   let liked = false;
   const user_id = res.locals.userId;
   try {
-    const { rows: posts } = await getUserByIdRepository(id);
+    const { rows: posts } = await getUserByIdRepository(id, refresh_type, timestamp);
     const morePostsInfos = [];
     for (let i = 0; posts.length > i; i++) {
       const {

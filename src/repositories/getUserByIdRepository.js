@@ -1,18 +1,21 @@
 import db from "../database/database.js";
 
-export async function getUserByIdRepository(id) {
+export async function getUserByIdRepository(id, refresh_type, timestamp) {
+  let time_filter = ""
+  if(refresh_type === "bottom") time_filter = `AND p.created_at < $2` 
+  if(refresh_type === "top")  time_filter = `AND p.created_at > $2` 
   return await db.query(
     `
-  SELECT p.owner, p.link, p.description, p.id, users.pic_url, users.name
+  SELECT p.owner, p.link, p.description, p.created_at, p.id, users.pic_url, users.name
   FROM posts p
   JOIN users
   ON users.id = p.owner
-  WHERE p.deleted = false AND users.id = $1
+  WHERE p.deleted = false AND users.id = $1 ${time_filter}
   GROUP BY p.id, users.pic_url, users.name
   ORDER BY p.created_at DESC
   LIMIT 20;
     `,
-    [id]
+    [id, timestamp]
   );
 }
 
