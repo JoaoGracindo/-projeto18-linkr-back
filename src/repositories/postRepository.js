@@ -12,8 +12,12 @@ export async function insertPostRepository(userId, link, description) {
   );
 }
 
-export async function getTimelineRepository() {
+export async function getTimelineRepository(refresh_type, timestamp) {
+  let time_filter = ""
+  if(refresh_type === "bottom") time_filter = `AND p.created_at < ${timestamp}` 
+  if(refresh_type === "top")  time_filter = `AND p.created_at > ${timestamp}` 
   return await db.query(`
+
   SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name,
   repost_user.name AS reposted_by_name
   FROM posts p
@@ -22,8 +26,7 @@ export async function getTimelineRepository() {
   WHERE p.deleted = false
   GROUP BY p.id, users.pic_url, users.name, repost_user.name
   ORDER BY p.created_at DESC
-  LIMIT 20;
-
+  LIMIT 10;
     `);
 }
 
@@ -60,10 +63,13 @@ export async function deleteLinkRepository(postId) {
   );
 }
 
-export async function getPostByHashtagRepository(hashtag) {
+export async function getPostByHashtagRepository(hashtag, refresh_type, timestamp) {
+  let time_filter = ""
+  if(refresh_type === "bottom") time_filter = `AND p.created_at < $2` 
+  if(refresh_type === "top")  time_filter = `AND p.created_at > $2` 
   return await db.query(
     `
-      SELECT p.owner, p.link, p.description, p.id, users.pic_url, users.name
+      SELECT p.owner, p.link, p.description, p.id, users.pic_url, p.created_at, users.name
       FROM posts p
       JOIN users
       ON users.id = p.owner
@@ -71,12 +77,12 @@ export async function getPostByHashtagRepository(hashtag) {
       ON pt.post_id = p.id
       JOIN tags
       ON tags.id = pt.tag_id
-      WHERE p.deleted = false AND tags.name = $1
+      WHERE p.deleted = false AND tags.name = $1 ${time_filter}
       GROUP BY p.id, users.pic_url, users.name
       ORDER BY p.created_at DESC
-      LIMIT 20;
+      LIMIT 10;
     `,
-    [hashtag]
+    [hashtag, timestamp]
   );
 }
 
