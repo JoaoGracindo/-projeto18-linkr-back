@@ -30,6 +30,8 @@ CREATE TABLE "posts" (
 	"link" TEXT NOT NULL,
 	"description" TEXT,
 	"deleted" BOOLEAN NOT NULL DEFAULT false,
+	"reposted_by" int DEFAULT NULL,
+	"origin_post_id" int DEFAULT NULL,
 	"created_at" TIMESTAMP NOT NULL DEFAULT now(),
 	CONSTRAINT "posts_pk" PRIMARY KEY ("id")
 ) WITH (
@@ -110,6 +112,9 @@ ALTER TABLE "likes" ADD CONSTRAINT "likes_fk1" FOREIGN KEY ("post_id") REFERENCE
 
 ALTER TABLE "reposts" ADD CONSTRAINT "reposts_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("id");
 ALTER TABLE "reposts" ADD CONSTRAINT "reposts_fk1" FOREIGN KEY ("post_id") REFERENCES "posts"("id"); 
+
+ALTER TABLE "posts" ADD CONSTRAINT "posts_fk2" FOREIGN KEY ("reposted_by") REFERENCES "users"("id");
+ALTER TABLE "posts" ADD CONSTRAINT "posts_fk1" FOREIGN KEY ("origin_post_id") REFERENCES "posts"("id"); 
 
 ALTER TABLE "comments" ADD CONSTRAINT "comments_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("id");
 ALTER TABLE "comments" ADD CONSTRAINT "comments_fk1" FOREIGN KEY ("post_id") REFERENCES "posts"("id"); 

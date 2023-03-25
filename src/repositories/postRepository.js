@@ -99,3 +99,20 @@ export async function repostLinkRepository(user_id,post_id){
     `,[user_id,post_id]
   )
 }
+
+export async function getReposts(){
+  return await db.query(
+    `
+    SELECT p.owner, p.link, p.description, p.id, users.pic_url
+    FROM posts p
+    JOIN users
+    ON users.id = p.owner
+    JOIN reposts
+    ON posts.id = resposts.post_id
+    WHERE p.deleted = false
+    GROUP BY p.id, users.pic_url, users.name
+    ORDER BY p.created_at DESC
+    LIMIT 20;
+    `
+  )
+}
