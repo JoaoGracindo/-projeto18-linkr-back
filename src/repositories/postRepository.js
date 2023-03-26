@@ -16,7 +16,8 @@ export async function getTimelineRepository(refresh_type, timestamp) {
   let time_filter = ""
   if(refresh_type === "bottom") time_filter = `AND p.created_at < ${timestamp}` 
   if(refresh_type === "top")  time_filter = `AND p.created_at > ${timestamp}` 
-  return await db.query(`
+  return await db.query(
+    `
     SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name,
     repost_user.name AS reposted_by_name,
     (SELECT COUNT(*) FROM posts WHERE origin_post_id = p.id) as repost_count
@@ -26,7 +27,7 @@ export async function getTimelineRepository(refresh_type, timestamp) {
     WHERE p.deleted = false
     GROUP BY p.id, users.pic_url, users.name, repost_user.name
     ORDER BY p.created_at DESC
-      LIMIT 10;
+    LIMIT 10;
     `);
 }
 
