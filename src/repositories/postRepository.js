@@ -18,9 +18,9 @@ export async function getTimelineRepository(refresh_type, timestamp, user_id) {
   if(refresh_type === "bottom") time_filter = `AND p.created_at < ${timestamp}` 
   if(refresh_type === "top")  time_filter = `AND p.created_at > ${timestamp}` 
   if(user_id) follow_filter = `AND f.follower = ${user_id}`;
-  return await db.query(
-    `
-    SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name,
+  return await db.query(`
+
+  SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name,
     repost_user.name AS reposted_by_name,
     (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS "commentsCount",
     (SELECT 
@@ -34,7 +34,7 @@ export async function getTimelineRepository(refresh_type, timestamp, user_id) {
     JOIN users ON users.id = p.owner
     JOIN follows f ON (f.user_id=p.owner OR f.follower_id = p.owner)
     LEFT JOIN users AS repost_user ON repost_user.id = p.reposted_by
-    WHERE p.deleted = false
+    WHERE p.deleted = false ${time_filter}
     AND (p.owner = $1 OR f.follower_id = $1)
     GROUP BY p.id, users.pic_url, users.name, repost_user.name
     ORDER BY p.created_at DESC
@@ -76,9 +76,12 @@ export async function deleteLinkRepository(postId) {
 }
 
 export async function getPostByHashtagRepository(hashtag, refresh_type, timestamp) {
+  let bind = [hashtag]
   let time_filter = ""
+  if(refresh_type) bind.push(timestamp)
   if(refresh_type === "bottom") time_filter = `AND p.created_at < $2` 
   if(refresh_type === "top")  time_filter = `AND p.created_at > $2` 
+
   return await db.query(
     `
       SELECT p.owner, p.link, p.description, p.id, users.pic_url, p.created_at, users.name
@@ -94,7 +97,7 @@ export async function getPostByHashtagRepository(hashtag, refresh_type, timestam
       ORDER BY p.created_at DESC
       LIMIT 10;
     `,
-    [hashtag, timestamp]
+    bind
   );
 }
 

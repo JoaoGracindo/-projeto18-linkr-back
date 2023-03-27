@@ -8,7 +8,7 @@ import urlMetadata from "url-metadata";
 export async function getUserByIdController(req, res) {
   let responseSent = false;
   const { id } = req.params;
-  const {refresh_type, timestamp} = req.body
+  const {refresh_type, timestamp} = req.headers
   let liked = false;
   const user_id = res.locals.userId;
   try {

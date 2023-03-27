@@ -1,9 +1,11 @@
 import db from "../database/database.js";
 
 export async function getUserByIdRepository(id, refresh_type, timestamp) {
-  let time_filter = ""
-  if(refresh_type === "bottom") time_filter = `AND p.created_at < $2` 
-  if(refresh_type === "top")  time_filter = `AND p.created_at > $2` 
+  let time_filter = "";
+  let bind = [id];
+  if (refresh_type) bind.push(timestamp);
+  if (refresh_type === "bottom") time_filter = `AND p.created_at < $2`;
+  if (refresh_type === "top") time_filter = `AND p.created_at > $2`;
   return await db.query(
     `
   SELECT p.owner, p.link, p.description, p.created_at, p.id, users.pic_url, users.name
@@ -15,7 +17,7 @@ export async function getUserByIdRepository(id, refresh_type, timestamp) {
   ORDER BY p.created_at DESC
   LIMIT 20;
     `,
-    [id, timestamp]
+    bind
   );
 }
 
@@ -32,10 +34,13 @@ export async function getLikesRepository(postId) {
     [postId]
   );
 
-  const count = await db.query(`
+  const count = await db.query(
+    `
   SELECT count(likes.post_id)
   FROM likes
-  WHERE likes.post_id = $1`, [postId]);
+  WHERE likes.post_id = $1`,
+    [postId]
+  );
 
-  return {users, count}
+  return { users, count };
 }
