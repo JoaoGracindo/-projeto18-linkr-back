@@ -12,10 +12,12 @@ export async function insertPostRepository(userId, link, description) {
   );
 }
 
-export async function getTimelineRepository(refresh_type, timestamp) {
+export async function getTimelineRepository(refresh_type, timestamp, user_id) {
   let time_filter = ""
+  let follow_filter = "";
   if(refresh_type === "bottom") time_filter = `AND p.created_at < ${timestamp}` 
   if(refresh_type === "top")  time_filter = `AND p.created_at > ${timestamp}` 
+  if(user_id) follow_filter = `AND f.follower = ${user_id}`;
   return await db.query(
     `
     SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name,
@@ -30,12 +32,14 @@ export async function getTimelineRepository(refresh_type, timestamp) {
     AS repost_count) AS repost_count
     FROM posts p
     JOIN users ON users.id = p.owner
+    JOIN follows f ON f.user_id=p.owner
     LEFT JOIN users AS repost_user ON repost_user.id = p.reposted_by
     WHERE p.deleted = false
+    AND f.follower_id = $1
     GROUP BY p.id, users.pic_url, users.name, repost_user.name
     ORDER BY p.created_at DESC
     LIMIT 10;
-    `);
+    `, [user_id]);
 }
 
 export async function getPostOwnerRepository(postId) {
