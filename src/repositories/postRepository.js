@@ -20,6 +20,7 @@ export async function getTimelineRepository(refresh_type, timestamp) {
     `
     SELECT p.owner, p.link, p.description, p.id, p.reposted_by, p.origin_post_id, users.pic_url, users.name,
     repost_user.name AS reposted_by_name,
+    (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS "commentsCount",
     (SELECT COUNT(*) FROM posts WHERE origin_post_id = p.id) as repost_count
     FROM posts p
     JOIN users ON users.id = p.owner

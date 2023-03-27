@@ -9,14 +9,14 @@ export async function postCommentRepository(userId, postId, comment){
     `, [comment, userId, postId]);
 }
 
-export async function getCommentByIdRepository(id){
+export async function getCommentsByIdRepository(id){
 
     return db.query(`
         SELECT c.comment, u.name, u.pic_url
         FROM comments c
         JOIN users u
         ON c.user_id = u.id
-        WHERE c.id=$1
+        WHERE c.post_id=$1
         ORDER BY c.created_at ASC;
     `, [id])
 }
