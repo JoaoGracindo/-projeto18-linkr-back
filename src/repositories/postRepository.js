@@ -32,10 +32,10 @@ export async function getTimelineRepository(refresh_type, timestamp, user_id) {
     AS repost_count) AS repost_count
     FROM posts p
     JOIN users ON users.id = p.owner
-    JOIN follows f ON f.user_id=p.owner
+    JOIN follows f ON (f.user_id=p.owner OR f.follower_id = p.owner)
     LEFT JOIN users AS repost_user ON repost_user.id = p.reposted_by
     WHERE p.deleted = false
-    AND f.follower_id = $1
+    AND (p.owner = $1 OR f.follower_id = $1)
     GROUP BY p.id, users.pic_url, users.name, repost_user.name
     ORDER BY p.created_at DESC
     LIMIT 10;
