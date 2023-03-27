@@ -1,4 +1,4 @@
-import { getCommentByIdRepository, postCommentRepository } from "../repositories/commentsRepository.js";
+import { getCommentsByIdRepository, postCommentRepository } from "../repositories/commentsRepository.js";
 
 export async function postCommentController(req, res){
 
@@ -8,19 +8,20 @@ export async function postCommentController(req, res){
 
     try{
         await postCommentRepository(userId, id, comment);
-        return res.sendStatus(201);
+        const {rows: comments} = await getCommentsByIdRepository(id);
+        return res.status(201).send(comments);
 
     }catch(err){
         return res.status(500).send(err.message);
     }
 }
 
-export async function getCommentByIdController(req, res){
+export async function getCommentsByIdController(req, res){
 
     const {id} = req.params;
 
     try{
-        const {rows: comments} = await getCommentByIdRepository(id);
+        const {rows: comments} = await getCommentsByIdRepository(id);
         return res.status(200).send(comments);
 
     }catch(err){

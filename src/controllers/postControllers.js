@@ -17,7 +17,7 @@ export async function getTimelineController(req, res) {
   const user_id = res.locals?.userId;
   const {refresh_type, timestamp} = req.headers 
   try {
-    const { rows: timeline } = await getTimelineRepository(refresh_type, timestamp);
+    const { rows: timeline } = await getTimelineRepository(refresh_type, timestamp, user_id);
     const likes = [];
     
     for (let i = 0; timeline.length > i; i++) {
