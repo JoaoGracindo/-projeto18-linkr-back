@@ -14,15 +14,15 @@ export async function insertPostRepository(userId, link, description) {
 
 export async function getTimelineRepository(refresh_type, timestamp) {
   let time_filter = ""
-  if(refresh_type === "bottom") time_filter = `AND p.created_at < ${timestamp}` 
-  if(refresh_type === "top")  time_filter = `AND p.created_at > ${timestamp}` 
+  if(refresh_type === "bottom") time_filter = `AND p.created_at < '${timestamp}'` 
+  if(refresh_type === "top")  time_filter = `AND p.created_at > '${timestamp}'` 
   return await db.query(`
 
   SELECT p.owner, p.link, p.description, p.id, p.created_at, p.reposted_by, p.origin_post_id, users.pic_url, users.name
   FROM posts p
   JOIN users
   ON users.id = p.owner
-  WHERE p.deleted = false
+  WHERE p.deleted = false ${time_filter}
   GROUP BY p.id, p.created_at, users.pic_url, users.name
   ORDER BY p.created_at DESC
   LIMIT 10;
@@ -63,9 +63,12 @@ export async function deleteLinkRepository(postId) {
 }
 
 export async function getPostByHashtagRepository(hashtag, refresh_type, timestamp) {
+  let bind = [hashtag]
   let time_filter = ""
+  if(refresh_type) bind.push(timestamp)
   if(refresh_type === "bottom") time_filter = `AND p.created_at < $2` 
   if(refresh_type === "top")  time_filter = `AND p.created_at > $2` 
+
   return await db.query(
     `
       SELECT p.owner, p.link, p.description, p.id, users.pic_url, p.created_at, users.name
@@ -81,7 +84,7 @@ export async function getPostByHashtagRepository(hashtag, refresh_type, timestam
       ORDER BY p.created_at DESC
       LIMIT 10;
     `,
-    [hashtag, timestamp]
+    bind
   );
 }
 
